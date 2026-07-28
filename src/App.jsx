@@ -10,14 +10,15 @@ import CropModal from './components/CropModal';
 import AdminModal from './components/AdminModal';
 
 const INITIAL_TEMPLATES = [
-  { id: 'happy-cust', name: 'Happy Cust', src: 'assets/templates/Happy cust.png', filename: 'Happy cust.png' }
+  { id: 'happy-cust-1080', name: 'Happy Cust 1080x1080', src: 'assets/templates/happy customer template 1080x1080.png', filename: 'happy customer template 1080x1080.png' },
+  { id: 'happy-cust-full', name: 'Happy Customer', src: 'assets/templates/happy customer template.png', filename: 'happy customer template.png' }
 ];
 
 export default function App() {
   const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
-  const [selectedTemplateSrc, setSelectedTemplateSrc] = useState('assets/templates/Happy cust.png');
+  const [selectedTemplateSrc, setSelectedTemplateSrc] = useState('assets/templates/happy customer template 1080x1080.png');
   const [templateImage, setTemplateImage] = useState(null);
-  const [nativeDim, setNativeDim] = useState({ width: 800, height: 1100 });
+  const [nativeDim, setNativeDim] = useState({ width: 1080, height: 1080 });
 
   const [originalPhoto, setOriginalPhoto] = useState(null);
   const [photoImage, setPhotoImage] = useState(null);
