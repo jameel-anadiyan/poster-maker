@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function StepNav({ activeStep, onChangeTemplate, onOpenCalculator }) {
+export default function StepNav({ activeStep, onChangeTemplate }) {
   return (
     <div style={{ background: 'rgba(9, 13, 22, 0.95)', borderBottom: '1px solid var(--bg-card-border)', position: 'sticky', top: 0, zIndex: 100 }}>
       {/* Brand & Action Bar */}
@@ -10,26 +10,14 @@ export default function StepNav({ activeStep, onChangeTemplate, onOpenCalculator
           <span style={{ fontWeight: '700', fontSize: '1rem', color: '#fff' }}>SWA Diamonds</span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <button
-            type="button"
-            className="btn btn-secondary"
-            style={{ padding: '0.3rem 0.65rem', fontSize: '0.78rem', minHeight: '34px' }}
-            onClick={onChangeTemplate}
-          >
-            🖼️ Select Template
-          </button>
-
-          <button
-            type="button"
-            className="btn btn-accent"
-            style={{ padding: '0.3rem 0.65rem', fontSize: '0.78rem', minHeight: '34px', background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', fontWeight: '700' }}
-            onClick={onOpenCalculator}
-            title="Open Calculator"
-          >
-            🧮 MUNEER
-          </button>
-        </div>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          style={{ padding: '0.3rem 0.65rem', fontSize: '0.78rem', minHeight: '34px' }}
+          onClick={onChangeTemplate}
+        >
+          🖼️ Select Template
+        </button>
       </div>
 
       {/* Step Wizard Navigation Bar */}

@@ -9,7 +9,6 @@ import CropModal from './components/CropModal';
 import AdminModal from './components/AdminModal';
 import TemplateSelectModal from './components/TemplateSelectModal';
 import MobileQuickBar from './components/MobileQuickBar';
-import CalculatorModal from './components/CalculatorModal';
 
 const INITIAL_TEMPLATES = [
   { id: 'happy-cust-1', name: 'Happy Customer 1', src: 'assets/templates/HAPPY CUSTOMER1.png', filename: 'HAPPY CUSTOMER1.png' },
@@ -54,7 +53,6 @@ export default function App() {
   const [isTemplateSelectOpen, setIsTemplateSelectOpen] = useState(true);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
   const canvasEditorRef = useRef(null);
   const photoInputRef = useRef(null);
@@ -232,7 +230,6 @@ export default function App() {
       <StepNav
         activeStep={activeStep}
         onChangeTemplate={() => setIsTemplateSelectOpen(true)}
-        onOpenCalculator={() => setIsCalculatorOpen(true)}
       />
 
       <main className="app-container">
@@ -311,12 +308,6 @@ export default function App() {
             canvasEditorRef.current.exportHighResPNG();
           }
         }}
-      />
-
-      {/* Calculator Modal */}
-      <CalculatorModal
-        isOpen={isCalculatorOpen}
-        onClose={() => setIsCalculatorOpen(false)}
       />
 
       {/* Initial Template Selection Intro Modal */}
