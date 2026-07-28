@@ -1,13 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-export default function StepNav({ activeStep, onChangeTemplate }) {
-  const [muneerVal, setMuneerVal] = useState(null);
-
-  const handleMuneerClick = () => {
-    const randomNum = Math.floor(Math.random() * 101);
-    setMuneerVal(randomNum);
-  };
-
+export default function StepNav({ activeStep, onChangeTemplate, onOpenCalculator }) {
   return (
     <div style={{ background: 'rgba(9, 13, 22, 0.95)', borderBottom: '1px solid var(--bg-card-border)', position: 'sticky', top: 0, zIndex: 100 }}>
       {/* Brand & Action Bar */}
@@ -31,26 +24,11 @@ export default function StepNav({ activeStep, onChangeTemplate }) {
             type="button"
             className="btn btn-accent"
             style={{ padding: '0.3rem 0.65rem', fontSize: '0.78rem', minHeight: '34px', background: 'linear-gradient(135deg, #f59e0b, #d97706)', border: 'none', fontWeight: '700' }}
-            onClick={handleMuneerClick}
+            onClick={onOpenCalculator}
+            title="Open Calculator"
           >
-            🎲 MUNEER
+            🧮 MUNEER
           </button>
-
-          {muneerVal !== null && (
-            <span
-              className="badge"
-              style={{
-                background: 'rgba(245, 158, 11, 0.25)',
-                color: '#fbbf24',
-                border: '1px solid rgba(245, 158, 11, 0.5)',
-                fontSize: '0.85rem',
-                padding: '0.3rem 0.6rem',
-                fontWeight: '700'
-              }}
-            >
-              Result: {muneerVal}
-            </span>
-          )}
         </div>
       </div>
 
