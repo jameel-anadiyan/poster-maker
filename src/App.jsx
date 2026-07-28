@@ -7,8 +7,14 @@ import PhotoUpload from './components/PhotoUpload';
 import CanvasEditor from './components/CanvasEditor';
 import ControlsPanel from './components/ControlsPanel';
 import CropModal from './components/CropModal';
+import AdminModal from './components/AdminModal';
+
+const INITIAL_TEMPLATES = [
+  { id: 'happy-cust', name: 'Happy Cust', src: 'assets/templates/Happy cust.png' }
+];
 
 export default function App() {
+  const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
   const [selectedTemplateSrc, setSelectedTemplateSrc] = useState('assets/templates/Happy cust.png');
   const [templateImage, setTemplateImage] = useState(null);
   const [nativeDim, setNativeDim] = useState({ width: 800, height: 1100 });
@@ -25,6 +31,7 @@ export default function App() {
   });
 
   const [isCropOpen, setIsCropOpen] = useState(false);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const canvasEditorRef = useRef(null);
 
   useEffect(() => {
@@ -48,6 +55,24 @@ export default function App() {
 
   const handleSelectTemplate = (src) => {
     setSelectedTemplateSrc(src);
+  };
+
+  const handleAddTemplate = (newTpl) => {
+    setTemplates((prev) => [...prev, newTpl]);
+    setSelectedTemplateSrc(newTpl.src);
+  };
+
+  const handleDeleteTemplate = (idToDelete) => {
+    setTemplates((prev) => {
+      const filtered = prev.filter((t) => t.id !== idToDelete);
+      if (filtered.length > 0 && selectedTemplateSrc) {
+        const deletedItem = prev.find((t) => t.id === idToDelete);
+        if (deletedItem && selectedTemplateSrc.includes(deletedItem.src)) {
+          setSelectedTemplateSrc(filtered[0].src);
+        }
+      }
+      return filtered;
+    });
   };
 
   const handlePhotoUpload = (dataUrl) => {
@@ -129,11 +154,11 @@ export default function App() {
 
   return (
     <>
-      <Header />
+      <Header onOpenAdmin={() => setIsAdminOpen(true)} />
       <StepNav activeStep={activeStep} />
 
       <main className="app-container">
-        {/* Left Column: Canvas & Adjustments (Stacked below preview on mobile) */}
+        {/* Left Column: Canvas & Adjustments */}
         <section className="viewport-section">
           <CanvasEditor
             ref={canvasEditorRef}
@@ -159,6 +184,7 @@ export default function App() {
         {/* Right Column: Template Picker, Upload & Download */}
         <aside className="controls-sidebar">
           <TemplateGallery
+            templates={templates}
             selectedTemplate={selectedTemplateSrc}
             onSelectTemplate={handleSelectTemplate}
             nativeDim={nativeDim}
@@ -198,6 +224,14 @@ export default function App() {
         originalPhoto={originalPhoto}
         onClose={() => setIsCropOpen(false)}
         onApplyCrop={handleApplyCrop}
+      />
+
+      <AdminModal
+        isOpen={isAdminOpen}
+        onClose={() => setIsAdminOpen(false)}
+        templates={templates}
+        onAddTemplate={handleAddTemplate}
+        onDeleteTemplate={handleDeleteTemplate}
       />
 
       <footer className="app-footer">

@@ -240,8 +240,16 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     return (Math.atan2(dy, dx) * 180) / Math.PI;
   };
 
+  const aspectStyle = templateImage
+    ? { aspectRatio: `${templateImage.naturalWidth} / ${templateImage.naturalHeight}` }
+    : {};
+
   return (
-    <div className="canvas-wrapper has-template" ref={containerRef}>
+    <div
+      className="canvas-wrapper has-template"
+      ref={containerRef}
+      style={aspectStyle}
+    >
       <canvas
         ref={canvasRef}
         id="editorCanvas"

@@ -219,7 +219,7 @@ body {
   position: relative;
   width: 100%;
   max-width: 650px;
-  aspect-ratio: 1 / 1;
+  max-height: 72vh;
   background: #030712;
   border-radius: var(--radius-lg);
   border: 2px dashed rgba(255, 255, 255, 0.15);
@@ -229,6 +229,7 @@ body {
   justify-content: center;
   overflow: hidden;
   touch-action: none;
+  transition: aspect-ratio 0.3s ease;
 }
 
 .canvas-wrapper.has-template {

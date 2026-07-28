@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
-const INITIAL_TEMPLATES = [
-  { id: 'happy-cust', name: 'Happy Cust', src: 'assets/templates/Happy cust.png' }
-];
-
-export default function TemplateGallery({ selectedTemplate, onSelectTemplate, nativeDim }) {
-  const [templates] = useState(INITIAL_TEMPLATES);
+export default function TemplateGallery({
+  templates = [],
+  selectedTemplate,
+  onSelectTemplate,
+  nativeDim
+}) {
   const [cacheBuster, setCacheBuster] = useState(Date.now());
   const [refreshing, setRefreshing] = useState(false);
 
@@ -42,8 +42,9 @@ export default function TemplateGallery({ selectedTemplate, onSelectTemplate, na
       </div>
       <div className="template-grid" id="templateGrid">
         {templates.map((tpl) => {
-          const fullSrc = `${tpl.src}?v=${cacheBuster}`;
-          const isSelected = selectedTemplate && selectedTemplate.startsWith(tpl.src);
+          const isDataUrl = tpl.src.startsWith('data:');
+          const fullSrc = isDataUrl ? tpl.src : `${tpl.src}?v=${cacheBuster}`;
+          const isSelected = selectedTemplate && (selectedTemplate === tpl.src || selectedTemplate.startsWith(tpl.src));
           return (
             <div
               key={tpl.id}
