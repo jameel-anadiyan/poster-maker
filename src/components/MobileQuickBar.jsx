@@ -4,7 +4,8 @@ export default function MobileQuickBar({
   photoImage,
   onTriggerUpload,
   onOpenCrop,
-  onDownload
+  onDownload,
+  onWhatsAppShare
 }) {
   return (
     <div className="mobile-quick-bar">
@@ -28,10 +29,20 @@ export default function MobileQuickBar({
 
       <button
         type="button"
+        className="btn btn-secondary mobile-quick-btn"
+        style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)', color: '#fff', border: 'none' }}
+        onClick={onWhatsAppShare}
+        title="Share Poster Attachment to WhatsApp"
+      >
+        <span>💬</span> WhatsApp
+      </button>
+
+      <button
+        type="button"
         className="btn btn-success mobile-quick-btn"
         onClick={onDownload}
       >
-        <span>💾</span> Download HD
+        <span>💾</span> Download
       </button>
     </div>
   );

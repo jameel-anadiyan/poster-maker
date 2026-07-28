@@ -279,19 +279,34 @@ export default function App() {
 
           <div className="panel-card export-panel">
             <div className="panel-title">
-              <span>4. Download HD Image</span>
+              <span>4. Export & Share HD Image</span>
             </div>
-            <button
-              type="button"
-              className="btn btn-success btn-full"
-              onClick={() => {
-                if (canvasEditorRef.current) {
-                  canvasEditorRef.current.exportHighResPNG();
-                }
-              }}
-            >
-              <span>💾</span> Download High-Res PNG
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              <button
+                type="button"
+                className="btn btn-secondary btn-full"
+                style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)', color: '#fff', border: 'none', fontWeight: '700' }}
+                onClick={() => {
+                  if (canvasEditorRef.current) {
+                    canvasEditorRef.current.shareToWhatsApp();
+                  }
+                }}
+              >
+                <span>💬</span> Share Attachment to WhatsApp
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-success btn-full"
+                onClick={() => {
+                  if (canvasEditorRef.current) {
+                    canvasEditorRef.current.exportHighResPNG();
+                  }
+                }}
+              >
+                <span>💾</span> Download High-Res PNG
+              </button>
+            </div>
             <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textAlign: 'center' }}>
               Exports at full native template resolution preserving transparent PNG quality.
             </p>
@@ -307,6 +322,11 @@ export default function App() {
         onDownload={() => {
           if (canvasEditorRef.current) {
             canvasEditorRef.current.exportHighResPNG();
+          }
+        }}
+        onWhatsAppShare={() => {
+          if (canvasEditorRef.current) {
+            canvasEditorRef.current.shareToWhatsApp();
           }
         }}
       />

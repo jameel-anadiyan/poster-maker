@@ -22,32 +22,8 @@ const CanvasEditor = forwardRef(function CanvasEditor(
 
   useImperativeHandle(ref, () => ({
     exportHighResPNG: () => {
-      if (!templateImage) {
-        alert("Please select a template frame first!");
-        return;
-      }
-
-      const exportCanvas = document.createElement('canvas');
-      const nativeW = templateImage.naturalWidth;
-      const nativeH = templateImage.naturalHeight;
-
-      exportCanvas.width = nativeW;
-      exportCanvas.height = nativeH;
-      const exportCtx = exportCanvas.getContext('2d');
-
-      if (layerOrder === 'template-above') {
-        if (photoImage) drawPhotoLayer(exportCtx, photoImage, photoState, 1.0);
-        exportCtx.drawImage(templateImage, 0, 0, nativeW, nativeH);
-      } else {
-        exportCtx.drawImage(templateImage, 0, 0, nativeW, nativeH);
-        if (photoImage) drawPhotoLayer(exportCtx, photoImage, photoState, 1.0);
-      }
-
-      exportCanvas.toBlob((blob) => {
-        if (!blob) {
-          alert("Failed to generate export image.");
-          return;
-        }
+      generateHighResBlob((blob) => {
+        if (!blob) return;
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
@@ -57,9 +33,83 @@ const CanvasEditor = forwardRef(function CanvasEditor(
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
-      }, 'image/png');
+      });
+    },
+
+    shareToWhatsApp: () => {
+      if (!templateImage) {
+        alert("Please select a template frame first!");
+        return;
+      }
+
+      generateHighResBlob(async (blob) => {
+        if (!blob) {
+          alert("Failed to generate poster image.");
+          return;
+        }
+
+        const file = new File([blob], 'swa-diamonds-poster.png', { type: 'image/png' });
+
+        // Check if device supports native file attachment sharing (iOS Safari, Android Chrome)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'SWA Diamonds Poster',
+              text: 'Check out your custom SWA Diamonds Happy Customer poster!'
+            });
+          } catch (err) {
+            if (err.name !== 'AbortError') {
+              console.error('Error sharing image attachment:', err);
+              fallbackWhatsAppShare(blob);
+            }
+          }
+        } else {
+          fallbackWhatsAppShare(blob);
+        }
+      });
     }
   }));
+
+  const generateHighResBlob = (callback) => {
+    if (!templateImage) {
+      alert("Please select a template frame first!");
+      return;
+    }
+
+    const exportCanvas = document.createElement('canvas');
+    const nativeW = templateImage.naturalWidth;
+    const nativeH = templateImage.naturalHeight;
+
+    exportCanvas.width = nativeW;
+    exportCanvas.height = nativeH;
+    const exportCtx = exportCanvas.getContext('2d');
+
+    if (layerOrder === 'template-above') {
+      if (photoImage) drawPhotoLayer(exportCtx, photoImage, photoState, 1.0);
+      exportCtx.drawImage(templateImage, 0, 0, nativeW, nativeH);
+    } else {
+      exportCtx.drawImage(templateImage, 0, 0, nativeW, nativeH);
+      if (photoImage) drawPhotoLayer(exportCtx, photoImage, photoState, 1.0);
+    }
+
+    exportCanvas.toBlob(callback, 'image/png');
+  };
+
+  const fallbackWhatsAppShare = (blob) => {
+    // 1. Download image to device
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `swa-diamonds-poster-${Date.now()}.png`;
+    link.href = url;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // 2. Alert user & open WhatsApp
+    alert("Poster image downloaded to your photos/downloads! Opening WhatsApp — select your contact and attach the downloaded image.");
+    window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent('Check out your custom SWA Diamonds poster image!'), '_blank');
+  };
 
   useEffect(() => {
     updateCanvasLayout();
