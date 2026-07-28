@@ -36,6 +36,35 @@ const CanvasEditor = forwardRef(function CanvasEditor(
       });
     },
 
+    sendToWhatsAppNumber: (fullNumber, customMsg) => {
+      if (!templateImage) {
+        alert("Please select a template frame first!");
+        return;
+      }
+
+      generateHighResBlob((blob) => {
+        if (!blob) {
+          alert("Failed to generate poster image.");
+          return;
+        }
+
+        // 1. Download image to device
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+        link.download = `swa-diamonds-poster-${timestamp}.png`;
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        // 2. Launch WhatsApp Chat directly targeted to phone number
+        const waUrl = `https://api.whatsapp.com/send?phone=${fullNumber}&text=${encodeURIComponent(customMsg)}`;
+        window.open(waUrl, '_blank');
+      });
+    },
+
     shareToWhatsApp: () => {
       if (!templateImage) {
         alert("Please select a template frame first!");
@@ -50,7 +79,6 @@ const CanvasEditor = forwardRef(function CanvasEditor(
 
         const file = new File([blob], 'swa-diamonds-poster.png', { type: 'image/png' });
 
-        // Check if device supports native file attachment sharing (iOS Safari, Android Chrome)
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
             await navigator.share({
@@ -60,7 +88,6 @@ const CanvasEditor = forwardRef(function CanvasEditor(
             });
           } catch (err) {
             if (err.name !== 'AbortError') {
-              console.error('Error sharing image attachment:', err);
               fallbackWhatsAppShare(blob);
             }
           }
@@ -97,7 +124,6 @@ const CanvasEditor = forwardRef(function CanvasEditor(
   };
 
   const fallbackWhatsAppShare = (blob) => {
-    // 1. Download image to device
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.download = `swa-diamonds-poster-${Date.now()}.png`;
@@ -106,8 +132,6 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     link.click();
     document.body.removeChild(link);
 
-    // 2. Alert user & open WhatsApp
-    alert("Poster image downloaded to your photos/downloads! Opening WhatsApp — select your contact and attach the downloaded image.");
     window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent('Check out your custom SWA Diamonds poster image!'), '_blank');
   };
 

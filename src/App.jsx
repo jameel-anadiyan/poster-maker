@@ -10,6 +10,7 @@ import CropModal from './components/CropModal';
 import AdminModal from './components/AdminModal';
 import TemplateSelectModal from './components/TemplateSelectModal';
 import MobileQuickBar from './components/MobileQuickBar';
+import WhatsAppModal from './components/WhatsAppModal';
 
 const INITIAL_TEMPLATES = [
   { id: 'happy-cust-1080', name: 'Happy Cust 1080x1080', src: 'assets/templates/happy customer template 1080x1080.png', filename: 'happy customer template 1080x1080.png' },
@@ -54,6 +55,8 @@ export default function App() {
   const [isTemplateSelectOpen, setIsTemplateSelectOpen] = useState(true);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
+
   const canvasEditorRef = useRef(null);
   const photoInputRef = useRef(null);
 
@@ -220,6 +223,18 @@ export default function App() {
     resetPhotoTransform(croppedImg, templateImage);
   };
 
+  const handleSendToWhatsAppNumber = (fullNumber, customMsg) => {
+    if (canvasEditorRef.current) {
+      canvasEditorRef.current.sendToWhatsAppNumber(fullNumber, customMsg);
+    }
+  };
+
+  const handleShareNativeWhatsAppFile = () => {
+    if (canvasEditorRef.current) {
+      canvasEditorRef.current.shareToWhatsApp();
+    }
+  };
+
   let activeStep = 1;
   if (isTemplateSelectOpen || !templateImage) activeStep = 1;
   else if (!photoImage) activeStep = 2;
@@ -286,13 +301,9 @@ export default function App() {
                 type="button"
                 className="btn btn-secondary btn-full"
                 style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)', color: '#fff', border: 'none', fontWeight: '700' }}
-                onClick={() => {
-                  if (canvasEditorRef.current) {
-                    canvasEditorRef.current.shareToWhatsApp();
-                  }
-                }}
+                onClick={() => setIsWhatsAppOpen(true)}
               >
-                <span>💬</span> Share Attachment to WhatsApp
+                <span>💬</span> WhatsApp Direct Chat
               </button>
 
               <button
@@ -324,11 +335,15 @@ export default function App() {
             canvasEditorRef.current.exportHighResPNG();
           }
         }}
-        onWhatsAppShare={() => {
-          if (canvasEditorRef.current) {
-            canvasEditorRef.current.shareToWhatsApp();
-          }
-        }}
+        onWhatsAppShare={() => setIsWhatsAppOpen(true)}
+      />
+
+      {/* WhatsApp Direct Chat Modal */}
+      <WhatsAppModal
+        isOpen={isWhatsAppOpen}
+        onClose={() => setIsWhatsAppOpen(false)}
+        onSendToNumber={handleSendToWhatsAppNumber}
+        onShareNativeFile={handleShareNativeWhatsAppFile}
       />
 
       {/* Initial Template Selection Intro Modal */}
