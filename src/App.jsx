@@ -11,8 +11,9 @@ import TemplateSelectModal from './components/TemplateSelectModal';
 import MobileQuickBar from './components/MobileQuickBar';
 
 const INITIAL_TEMPLATES = [
-  { id: 'happy-cust-1', name: 'Happy Customer 1', src: 'assets/templates/HAPPY CUSTOMER1.png', filename: 'HAPPY CUSTOMER1.png' },
-  { id: 'happy-cust-2', name: 'Happy Customer 2', src: 'assets/templates/HAPPY CUSTOMER2.png', filename: 'HAPPY CUSTOMER2.png' }
+  { id: 'happy-customer', name: 'Happy Customer', src: 'assets/templates/HAPPY CUSTOMER.png', filename: 'HAPPY CUSTOMER.png' },
+  { id: 'birthday-template', name: 'Birthday Template', src: 'assets/templates/birthday_template.png', filename: 'birthday_template.png' },
+  { id: 'anniversary-template', name: 'Anniversary Template', src: 'assets/templates/Anniversary template.png', filename: 'Anniversary template.png' }
 ];
 
 const STORAGE_KEY = 'template_editor_custom_templates';
