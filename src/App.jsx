@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-import Header from './components/Header';
 import StepNav from './components/StepNav';
 import TemplateGallery from './components/TemplateGallery';
 import PhotoUpload from './components/PhotoUpload';
@@ -10,7 +9,6 @@ import CropModal from './components/CropModal';
 import AdminModal from './components/AdminModal';
 import TemplateSelectModal from './components/TemplateSelectModal';
 import MobileQuickBar from './components/MobileQuickBar';
-import WhatsAppModal from './components/WhatsAppModal';
 
 const INITIAL_TEMPLATES = [
   { id: 'happy-cust-1080', name: 'Happy Cust 1080x1080', src: 'assets/templates/happy customer template 1080x1080.png', filename: 'happy customer template 1080x1080.png' },
@@ -55,7 +53,6 @@ export default function App() {
   const [isTemplateSelectOpen, setIsTemplateSelectOpen] = useState(true);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
 
   const canvasEditorRef = useRef(null);
   const photoInputRef = useRef(null);
@@ -223,18 +220,6 @@ export default function App() {
     resetPhotoTransform(croppedImg, templateImage);
   };
 
-  const handleSendToWhatsAppNumber = (fullNumber, customMsg) => {
-    if (canvasEditorRef.current) {
-      canvasEditorRef.current.sendToWhatsAppNumber(fullNumber, customMsg);
-    }
-  };
-
-  const handleShareNativeWhatsAppFile = () => {
-    if (canvasEditorRef.current) {
-      canvasEditorRef.current.shareToWhatsApp();
-    }
-  };
-
   let activeStep = 1;
   if (isTemplateSelectOpen || !templateImage) activeStep = 1;
   else if (!photoImage) activeStep = 2;
@@ -242,11 +227,10 @@ export default function App() {
 
   return (
     <>
-      <Header
-        onOpenAdmin={() => setIsAdminOpen(true)}
+      <StepNav
+        activeStep={activeStep}
         onChangeTemplate={() => setIsTemplateSelectOpen(true)}
       />
-      <StepNav activeStep={activeStep} />
 
       <main className="app-container">
         {/* Left Column: Canvas & Adjustments */}
@@ -294,30 +278,19 @@ export default function App() {
 
           <div className="panel-card export-panel">
             <div className="panel-title">
-              <span>4. Export & Share HD Image</span>
+              <span>4. Download HD Image</span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-              <button
-                type="button"
-                className="btn btn-secondary btn-full"
-                style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)', color: '#fff', border: 'none', fontWeight: '700' }}
-                onClick={() => setIsWhatsAppOpen(true)}
-              >
-                <span>💬</span> WhatsApp Direct Chat
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-success btn-full"
-                onClick={() => {
-                  if (canvasEditorRef.current) {
-                    canvasEditorRef.current.exportHighResPNG();
-                  }
-                }}
-              >
-                <span>💾</span> Download High-Res PNG
-              </button>
-            </div>
+            <button
+              type="button"
+              className="btn btn-success btn-full"
+              onClick={() => {
+                if (canvasEditorRef.current) {
+                  canvasEditorRef.current.exportHighResPNG();
+                }
+              }}
+            >
+              <span>💾</span> Download High-Res PNG
+            </button>
             <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textAlign: 'center' }}>
               Exports at full native template resolution preserving transparent PNG quality.
             </p>
@@ -335,15 +308,6 @@ export default function App() {
             canvasEditorRef.current.exportHighResPNG();
           }
         }}
-        onWhatsAppShare={() => setIsWhatsAppOpen(true)}
-      />
-
-      {/* WhatsApp Direct Chat Modal */}
-      <WhatsAppModal
-        isOpen={isWhatsAppOpen}
-        onClose={() => setIsWhatsAppOpen(false)}
-        onSendToNumber={handleSendToWhatsAppNumber}
-        onShareNativeFile={handleShareNativeWhatsAppFile}
       />
 
       {/* Initial Template Selection Intro Modal */}

@@ -34,67 +34,6 @@ const CanvasEditor = forwardRef(function CanvasEditor(
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       });
-    },
-
-    sendToWhatsAppNumber: (fullNumber, customMsg) => {
-      if (!templateImage) {
-        alert("Please select a template frame first!");
-        return;
-      }
-
-      generateHighResBlob((blob) => {
-        if (!blob) {
-          alert("Failed to generate poster image.");
-          return;
-        }
-
-        // 1. Download image to device
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-        link.download = `swa-diamonds-poster-${timestamp}.png`;
-        link.href = url;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
-        // 2. Launch WhatsApp Chat directly targeted to phone number
-        const waUrl = `https://api.whatsapp.com/send?phone=${fullNumber}&text=${encodeURIComponent(customMsg)}`;
-        window.open(waUrl, '_blank');
-      });
-    },
-
-    shareToWhatsApp: () => {
-      if (!templateImage) {
-        alert("Please select a template frame first!");
-        return;
-      }
-
-      generateHighResBlob(async (blob) => {
-        if (!blob) {
-          alert("Failed to generate poster image.");
-          return;
-        }
-
-        const file = new File([blob], 'swa-diamonds-poster.png', { type: 'image/png' });
-
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              files: [file],
-              title: 'SWA Diamonds Poster',
-              text: 'Check out your custom SWA Diamonds Happy Customer poster!'
-            });
-          } catch (err) {
-            if (err.name !== 'AbortError') {
-              fallbackWhatsAppShare(blob);
-            }
-          }
-        } else {
-          fallbackWhatsAppShare(blob);
-        }
-      });
     }
   }));
 
@@ -121,18 +60,6 @@ const CanvasEditor = forwardRef(function CanvasEditor(
     }
 
     exportCanvas.toBlob(callback, 'image/png');
-  };
-
-  const fallbackWhatsAppShare = (blob) => {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = `swa-diamonds-poster-${Date.now()}.png`;
-    link.href = url;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent('Check out your custom SWA Diamonds poster image!'), '_blank');
   };
 
   useEffect(() => {
@@ -339,7 +266,7 @@ const CanvasEditor = forwardRef(function CanvasEditor(
           {!templateImage
             ? 'Step 1: Select a template'
             : !photoImage
-            ? 'Step 2: Upload or take a photo'
+            ? 'Step 2: Upload photo'
             : 'Drag, Pinch-to-Zoom or Rotate photo'}
         </span>
       </div>

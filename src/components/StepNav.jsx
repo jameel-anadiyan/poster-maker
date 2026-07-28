@@ -1,27 +1,47 @@
 import React from 'react';
 
-export default function StepNav({ activeStep }) {
+export default function StepNav({ activeStep, onChangeTemplate }) {
   return (
-    <nav className="step-bar">
-      <div className={`step-item ${activeStep === 1 ? 'active' : ''}`}>
-        <span className="step-number">1</span>
-        <span>Choose Template</span>
+    <div style={{ background: 'rgba(9, 13, 22, 0.95)', borderBottom: '1px solid var(--bg-card-border)', sticky: 'top', zIndex: 100 }}>
+      {/* Brand & Action Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.6rem 1rem', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '1.3rem' }}>💎</span>
+          <span style={{ fontWeight: '700', fontSize: '1rem', color: '#fff' }}>SWA Diamonds</span>
+        </div>
+
+        <button
+          type="button"
+          className="btn btn-secondary"
+          style={{ padding: '0.3rem 0.65rem', fontSize: '0.78rem', minHeight: '34px' }}
+          onClick={onChangeTemplate}
+        >
+          🖼️ Select Template
+        </button>
       </div>
-      <span className="step-arrow">➔</span>
-      <div className={`step-item ${activeStep === 2 ? 'active' : ''}`}>
-        <span className="step-number">2</span>
-        <span>Add & Crop Photo</span>
-      </div>
-      <span className="step-arrow">➔</span>
-      <div className={`step-item ${activeStep === 3 ? 'active' : ''}`}>
-        <span className="step-number">3</span>
-        <span>Position & Align</span>
-      </div>
-      <span className="step-arrow">➔</span>
-      <div className={`step-item ${activeStep === 4 ? 'active' : ''}`}>
-        <span className="step-number">4</span>
-        <span>Download HD</span>
-      </div>
-    </nav>
+
+      {/* Step Wizard Navigation Bar */}
+      <nav className="step-bar" style={{ borderBottom: 'none' }}>
+        <div className={`step-item ${activeStep === 1 ? 'active' : ''}`}>
+          <span className="step-number">1</span>
+          <span>Choose Template</span>
+        </div>
+        <span className="step-arrow">➔</span>
+        <div className={`step-item ${activeStep === 2 ? 'active' : ''}`}>
+          <span className="step-number">2</span>
+          <span>Add & Crop Photo</span>
+        </div>
+        <span className="step-arrow">➔</span>
+        <div className={`step-item ${activeStep === 3 ? 'active' : ''}`}>
+          <span className="step-number">3</span>
+          <span>Position & Align</span>
+        </div>
+        <span className="step-arrow">➔</span>
+        <div className={`step-item ${activeStep === 4 ? 'active' : ''}`}>
+          <span className="step-number">4</span>
+          <span>Download HD</span>
+        </div>
+      </nav>
+    </div>
   );
 }
