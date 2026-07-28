@@ -9,6 +9,7 @@ import ControlsPanel from './components/ControlsPanel';
 import CropModal from './components/CropModal';
 import AdminModal from './components/AdminModal';
 import TemplateSelectModal from './components/TemplateSelectModal';
+import MobileQuickBar from './components/MobileQuickBar';
 
 const INITIAL_TEMPLATES = [
   { id: 'happy-cust-1080', name: 'Happy Cust 1080x1080', src: 'assets/templates/happy customer template 1080x1080.png', filename: 'happy customer template 1080x1080.png' },
@@ -50,13 +51,12 @@ export default function App() {
     rotation: 0
   });
 
-  // Controls whether the initial Template Selection intro screen is open
   const [isTemplateSelectOpen, setIsTemplateSelectOpen] = useState(true);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const canvasEditorRef = useRef(null);
+  const photoInputRef = useRef(null);
 
-  // Sync disk templates on mount
   useEffect(() => {
     fetchDiskTemplates();
   }, []);
@@ -274,6 +274,7 @@ export default function App() {
             onPhotoUpload={handlePhotoUpload}
             onOpenCrop={() => setIsCropOpen(true)}
             onRemovePhoto={handleRemovePhoto}
+            inputRef={photoInputRef}
           />
 
           <div className="panel-card export-panel">
@@ -297,6 +298,18 @@ export default function App() {
           </div>
         </aside>
       </main>
+
+      {/* Floating Sticky Action Bar for Mobile Screens */}
+      <MobileQuickBar
+        photoImage={photoImage}
+        onTriggerUpload={() => photoInputRef.current && photoInputRef.current.click()}
+        onOpenCrop={() => setIsCropOpen(true)}
+        onDownload={() => {
+          if (canvasEditorRef.current) {
+            canvasEditorRef.current.exportHighResPNG();
+          }
+        }}
+      />
 
       {/* Initial Template Selection Intro Modal */}
       <TemplateSelectModal

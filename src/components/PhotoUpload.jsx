@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
 
-export default function PhotoUpload({ photoImage, onPhotoUpload, onOpenCrop, onRemovePhoto }) {
+export default function PhotoUpload({ photoImage, onPhotoUpload, onOpenCrop, onRemovePhoto, inputRef }) {
   const fileInputRef = useRef(null);
+  const actualRef = inputRef || fileInputRef;
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -34,7 +35,7 @@ export default function PhotoUpload({ photoImage, onPhotoUpload, onOpenCrop, onR
       {/* Gallery File Input Only (No capture attribute) */}
       <input
         type="file"
-        ref={fileInputRef}
+        ref={actualRef}
         accept="image/*"
         className="hidden"
         onChange={handleFileChange}
@@ -44,7 +45,7 @@ export default function PhotoUpload({ photoImage, onPhotoUpload, onOpenCrop, onR
         <button
           type="button"
           className="btn btn-primary btn-full"
-          onClick={() => fileInputRef.current && fileInputRef.current.click()}
+          onClick={() => actualRef.current && actualRef.current.click()}
         >
           <span>📁</span> Upload Photo
         </button>
