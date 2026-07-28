@@ -13,9 +13,32 @@ const INITIAL_TEMPLATES = [
   { id: 'happy-cust', name: 'Happy Cust', src: 'assets/templates/Happy cust.png' }
 ];
 
+const STORAGE_KEY = 'template_editor_custom_templates';
+
 export default function App() {
-  const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
-  const [selectedTemplateSrc, setSelectedTemplateSrc] = useState('assets/templates/Happy cust.png');
+  // Load initial templates combined with persistent localStorage custom templates
+  const [templates, setTemplates] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsedCustoms = JSON.parse(saved);
+        if (Array.isArray(parsedCustoms) && parsedCustoms.length > 0) {
+          // Filter out duplicates if any
+          const customIds = new Set(parsedCustoms.map((t) => t.id));
+          const defaultsFiltered = INITIAL_TEMPLATES.filter((t) => !customIds.has(t.id));
+          return [...defaultsFiltered, ...parsedCustoms];
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load saved templates from localStorage:', err);
+    }
+    return INITIAL_TEMPLATES;
+  });
+
+  const [selectedTemplateSrc, setSelectedTemplateSrc] = useState(() => {
+    return templates.length > 0 ? templates[0].src : 'assets/templates/Happy cust.png';
+  });
+
   const [templateImage, setTemplateImage] = useState(null);
   const [nativeDim, setNativeDim] = useState({ width: 800, height: 1100 });
 
@@ -33,6 +56,19 @@ export default function App() {
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const canvasEditorRef = useRef(null);
+
+  // Sync custom templates to localStorage whenever templates state changes
+  const saveCustomTemplatesToStorage = (updatedTemplates) => {
+    try {
+      // Save only custom added or modified templates to storage
+      const customs = updatedTemplates.filter(
+        (t) => t.id.startsWith('custom-') || !INITIAL_TEMPLATES.some((init) => init.id === t.id)
+      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(customs));
+    } catch (err) {
+      console.error('Failed to save templates to localStorage:', err);
+    }
+  };
 
   useEffect(() => {
     if (!selectedTemplateSrc) return;
@@ -58,21 +94,31 @@ export default function App() {
   };
 
   const handleAddTemplate = (newTpl) => {
-    setTemplates((prev) => [...prev, newTpl]);
+    const updated = [...templates, newTpl];
+    setTemplates(updated);
+    saveCustomTemplatesToStorage(updated);
     setSelectedTemplateSrc(newTpl.src);
   };
 
   const handleDeleteTemplate = (idToDelete) => {
-    setTemplates((prev) => {
-      const filtered = prev.filter((t) => t.id !== idToDelete);
-      if (filtered.length > 0 && selectedTemplateSrc) {
-        const deletedItem = prev.find((t) => t.id === idToDelete);
-        if (deletedItem && selectedTemplateSrc.includes(deletedItem.src)) {
-          setSelectedTemplateSrc(filtered[0].src);
-        }
+    const updated = templates.filter((t) => t.id !== idToDelete);
+    setTemplates(updated);
+    saveCustomTemplatesToStorage(updated);
+
+    if (updated.length > 0 && selectedTemplateSrc) {
+      const deletedItem = templates.find((t) => t.id === idToDelete);
+      if (deletedItem && selectedTemplateSrc.includes(deletedItem.src)) {
+        setSelectedTemplateSrc(updated[0].src);
       }
-      return filtered;
-    });
+    }
+  };
+
+  const handleResetDefaults = () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {}
+    setTemplates(INITIAL_TEMPLATES);
+    setSelectedTemplateSrc(INITIAL_TEMPLATES[0].src);
   };
 
   const handlePhotoUpload = (dataUrl) => {
@@ -232,6 +278,7 @@ export default function App() {
         templates={templates}
         onAddTemplate={handleAddTemplate}
         onDeleteTemplate={handleDeleteTemplate}
+        onResetDefaults={handleResetDefaults}
       />
 
       <footer className="app-footer">

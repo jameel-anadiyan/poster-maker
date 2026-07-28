@@ -5,7 +5,8 @@ export default function AdminModal({
   onClose,
   templates,
   onAddTemplate,
-  onDeleteTemplate
+  onDeleteTemplate,
+  onResetDefaults
 }) {
   const [passwordInput, setPasswordInput] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -52,7 +53,7 @@ export default function AdminModal({
       onAddTemplate(newTpl);
       setNewTemplateName('');
       setSelectedFile(null);
-      alert(`Template "${newTpl.name}" added successfully to the gallery!`);
+      alert(`Template "${newTpl.name}" added & saved permanently!`);
     };
     reader.readAsDataURL(selectedFile);
   };
@@ -61,7 +62,7 @@ export default function AdminModal({
 
   return (
     <div className="crop-modal-overlay">
-      <div className="crop-modal-container" style={{ maxWidth: '560px' }}>
+      <div className="crop-modal-container" style={{ maxWidth: '580px' }}>
         
         {/* Modal Header */}
         <div className="crop-modal-header">
@@ -69,7 +70,7 @@ export default function AdminModal({
             <span>⚙️ Admin Console</span>
             {isAuthenticated && (
               <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
-                Unlocked (5005)
+                💾 Persistent Auto-Save
               </span>
             )}
           </div>
@@ -124,7 +125,7 @@ export default function AdminModal({
             {/* Section 1: Add New Template Form */}
             <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--bg-card-border)' }}>
               <h3 style={{ fontSize: '0.92rem', marginBottom: '0.75rem', color: 'var(--text-main)' }}>
-                ➕ Add New Frame Template
+                ➕ Add New Frame Template (Saved Permanently)
               </h3>
               <form onSubmit={handleAddTemplateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <div>
@@ -133,7 +134,7 @@ export default function AdminModal({
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. SWA Anniversary Frame"
+                    placeholder="e.g. SWA Custom Anniversary Frame"
                     value={newTemplateName}
                     onChange={(e) => setNewTemplateName(e.target.value)}
                     style={{
@@ -162,16 +163,31 @@ export default function AdminModal({
                   />
                 </div>
                 <button type="submit" className="btn btn-accent" style={{ alignSelf: 'flex-start', minHeight: '38px' }}>
-                  <span>➕</span> Add Template to Gallery
+                  <span>💾</span> Add & Save Template
                 </button>
               </form>
             </div>
 
             {/* Section 2: Manage Existing Templates List */}
             <div>
-              <h3 style={{ fontSize: '0.92rem', marginBottom: '0.75rem', color: 'var(--text-main)' }}>
-                🖼️ Active Templates ({templates.length})
-              </h3>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.92rem', color: 'var(--text-main)' }}>
+                  🖼️ Saved Templates ({templates.length})
+                </h3>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  style={{ padding: '0.2rem 0.5rem', fontSize: '0.72rem' }}
+                  onClick={() => {
+                    if (confirm('Reset gallery to default asset templates? Custom added templates will be removed.')) {
+                      onResetDefaults();
+                    }
+                  }}
+                >
+                  ↺ Reset Defaults
+                </button>
+              </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 {templates.map((tpl) => (
                   <div
@@ -194,7 +210,9 @@ export default function AdminModal({
                       />
                       <div>
                         <div style={{ fontSize: '0.85rem', fontWeight: '600' }}>{tpl.name}</div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>ID: {tpl.id}</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+                          {tpl.id.startsWith('custom-') ? 'Custom Persistent Template' : 'Default Asset'}
+                        </div>
                       </div>
                     </div>
                     {templates.length > 1 ? (
