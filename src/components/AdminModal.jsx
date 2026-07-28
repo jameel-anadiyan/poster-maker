@@ -5,12 +5,12 @@ export default function AdminModal({
   onClose,
   templates,
   onAddTemplate,
-  onDeleteTemplate,
-  onResetDefaults
+  onDeleteTemplate
 }) {
   const [passwordInput, setPasswordInput] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   // Add Template Form State
   const [newTemplateName, setNewTemplateName] = useState('');
@@ -43,17 +43,19 @@ export default function AdminModal({
       return;
     }
 
+    setIsSaving(true);
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const newTpl = {
-        id: `custom-${Date.now()}`,
-        name: newTemplateName.trim(),
-        src: event.target.result
-      };
-      onAddTemplate(newTpl);
-      setNewTemplateName('');
-      setSelectedFile(null);
-      alert(`Template "${newTpl.name}" added & saved permanently!`);
+    reader.onload = async (event) => {
+      try {
+        await onAddTemplate(newTemplateName.trim(), event.target.result);
+        setNewTemplateName('');
+        setSelectedFile(null);
+        alert(`Template "${newTemplateName.trim()}" physically saved to assets folder on disk!`);
+      } catch (err) {
+        alert('Failed to save file to repository folder.');
+      } finally {
+        setIsSaving(false);
+      }
     };
     reader.readAsDataURL(selectedFile);
   };
@@ -70,7 +72,7 @@ export default function AdminModal({
             <span>⚙️ Admin Console</span>
             {isAuthenticated && (
               <span className="badge" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
-                💾 Persistent Auto-Save
+                📁 Disk Repo Sync (5005)
               </span>
             )}
           </div>
@@ -125,7 +127,7 @@ export default function AdminModal({
             {/* Section 1: Add New Template Form */}
             <div style={{ background: 'rgba(15, 23, 42, 0.6)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--bg-card-border)' }}>
               <h3 style={{ fontSize: '0.92rem', marginBottom: '0.75rem', color: 'var(--text-main)' }}>
-                ➕ Add New Frame Template (Saved Permanently)
+                ➕ Save New Template to Repository Asset Folder
               </h3>
               <form onSubmit={handleAddTemplateSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <div>
@@ -134,7 +136,7 @@ export default function AdminModal({
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. SWA Custom Anniversary Frame"
+                    placeholder="e.g. SWA Premium Frame"
                     value={newTemplateName}
                     onChange={(e) => setNewTemplateName(e.target.value)}
                     style={{
@@ -150,7 +152,7 @@ export default function AdminModal({
                 </div>
                 <div>
                   <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>
-                    Select Template PNG File (with transparent cutout):
+                    Select Template PNG File (saved directly to disk):
                   </label>
                   <input
                     type="file"
@@ -162,8 +164,8 @@ export default function AdminModal({
                     }}
                   />
                 </div>
-                <button type="submit" className="btn btn-accent" style={{ alignSelf: 'flex-start', minHeight: '38px' }}>
-                  <span>💾</span> Add & Save Template
+                <button type="submit" className="btn btn-accent" disabled={isSaving} style={{ alignSelf: 'flex-start', minHeight: '38px' }}>
+                  <span>💾</span> {isSaving ? 'Saving to Disk...' : 'Save File to Asset Folder'}
                 </button>
               </form>
             </div>
@@ -172,20 +174,8 @@ export default function AdminModal({
             <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
                 <h3 style={{ fontSize: '0.92rem', color: 'var(--text-main)' }}>
-                  🖼️ Saved Templates ({templates.length})
+                  📁 Repository Asset Templates ({templates.length})
                 </h3>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  style={{ padding: '0.2rem 0.5rem', fontSize: '0.72rem' }}
-                  onClick={() => {
-                    if (confirm('Reset gallery to default asset templates? Custom added templates will be removed.')) {
-                      onResetDefaults();
-                    }
-                  }}
-                >
-                  ↺ Reset Defaults
-                </button>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -211,7 +201,7 @@ export default function AdminModal({
                       <div>
                         <div style={{ fontSize: '0.85rem', fontWeight: '600' }}>{tpl.name}</div>
                         <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
-                          {tpl.id.startsWith('custom-') ? 'Custom Persistent Template' : 'Default Asset'}
+                          {tpl.src.startsWith('data:') ? 'Base64 Memory' : tpl.src}
                         </div>
                       </div>
                     </div>
@@ -221,15 +211,15 @@ export default function AdminModal({
                         className="btn btn-danger"
                         style={{ padding: '0.3rem 0.65rem', minHeight: '32px', fontSize: '0.75rem' }}
                         onClick={() => {
-                          if (confirm(`Delete template "${tpl.name}"?`)) {
-                            onDeleteTemplate(tpl.id);
+                          if (confirm(`Delete template file "${tpl.name}" from repository disk folder?`)) {
+                            onDeleteTemplate(tpl);
                           }
                         }}
                       >
-                        🗑️ Delete
+                        🗑️ Delete File
                       </button>
                     ) : (
-                      <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Default Frame</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>Primary Frame</span>
                     )}
                   </div>
                 ))}

@@ -10,35 +10,12 @@ import CropModal from './components/CropModal';
 import AdminModal from './components/AdminModal';
 
 const INITIAL_TEMPLATES = [
-  { id: 'happy-cust', name: 'Happy Cust', src: 'assets/templates/Happy cust.png' }
+  { id: 'happy-cust', name: 'Happy Cust', src: 'assets/templates/Happy cust.png', filename: 'Happy cust.png' }
 ];
 
-const STORAGE_KEY = 'template_editor_custom_templates';
-
 export default function App() {
-  // Load initial templates combined with persistent localStorage custom templates
-  const [templates, setTemplates] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsedCustoms = JSON.parse(saved);
-        if (Array.isArray(parsedCustoms) && parsedCustoms.length > 0) {
-          // Filter out duplicates if any
-          const customIds = new Set(parsedCustoms.map((t) => t.id));
-          const defaultsFiltered = INITIAL_TEMPLATES.filter((t) => !customIds.has(t.id));
-          return [...defaultsFiltered, ...parsedCustoms];
-        }
-      }
-    } catch (err) {
-      console.error('Failed to load saved templates from localStorage:', err);
-    }
-    return INITIAL_TEMPLATES;
-  });
-
-  const [selectedTemplateSrc, setSelectedTemplateSrc] = useState(() => {
-    return templates.length > 0 ? templates[0].src : 'assets/templates/Happy cust.png';
-  });
-
+  const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
+  const [selectedTemplateSrc, setSelectedTemplateSrc] = useState('assets/templates/Happy cust.png');
   const [templateImage, setTemplateImage] = useState(null);
   const [nativeDim, setNativeDim] = useState({ width: 800, height: 1100 });
 
@@ -57,16 +34,26 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const canvasEditorRef = useRef(null);
 
-  // Sync custom templates to localStorage whenever templates state changes
-  const saveCustomTemplatesToStorage = (updatedTemplates) => {
+  // Load disk templates from API on mount
+  useEffect(() => {
+    fetchDiskTemplates();
+  }, []);
+
+  const fetchDiskTemplates = async () => {
     try {
-      // Save only custom added or modified templates to storage
-      const customs = updatedTemplates.filter(
-        (t) => t.id.startsWith('custom-') || !INITIAL_TEMPLATES.some((init) => init.id === t.id)
-      );
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(customs));
+      const res = await fetch('/api/templates');
+      if (res.ok) {
+        const diskList = await res.json();
+        if (Array.isArray(diskList) && diskList.length > 0) {
+          setTemplates(diskList);
+          // If current selected is not in list, select first
+          if (!diskList.some((t) => selectedTemplateSrc.includes(t.filename || t.src))) {
+            setSelectedTemplateSrc(diskList[0].src);
+          }
+        }
+      }
     } catch (err) {
-      console.error('Failed to save templates to localStorage:', err);
+      console.warn('Could not fetch templates from API, using defaults:', err);
     }
   };
 
@@ -93,32 +80,55 @@ export default function App() {
     setSelectedTemplateSrc(src);
   };
 
-  const handleAddTemplate = (newTpl) => {
-    const updated = [...templates, newTpl];
-    setTemplates(updated);
-    saveCustomTemplatesToStorage(updated);
-    setSelectedTemplateSrc(newTpl.src);
-  };
+  const handleAddTemplate = async (name, base64Data) => {
+    try {
+      const res = await fetch('/api/templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, imageBase64: base64Data })
+      });
 
-  const handleDeleteTemplate = (idToDelete) => {
-    const updated = templates.filter((t) => t.id !== idToDelete);
-    setTemplates(updated);
-    saveCustomTemplatesToStorage(updated);
-
-    if (updated.length > 0 && selectedTemplateSrc) {
-      const deletedItem = templates.find((t) => t.id === idToDelete);
-      if (deletedItem && selectedTemplateSrc.includes(deletedItem.src)) {
-        setSelectedTemplateSrc(updated[0].src);
+      if (res.ok) {
+        const savedTpl = await res.json();
+        setTemplates((prev) => [...prev, savedTpl]);
+        setSelectedTemplateSrc(`${savedTpl.src}?v=${Date.now()}`);
+        return savedTpl;
+      } else {
+        throw new Error('Failed to save to disk server');
       }
+    } catch (err) {
+      console.error('API Error saving template:', err);
+      // Fallback in-memory
+      const fallbackTpl = {
+        id: `custom-${Date.now()}`,
+        name,
+        src: base64Data
+      };
+      setTemplates((prev) => [...prev, fallbackTpl]);
+      setSelectedTemplateSrc(base64Data);
+      return fallbackTpl;
     }
   };
 
-  const handleResetDefaults = () => {
+  const handleDeleteTemplate = async (tplToDelete) => {
     try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch (e) {}
-    setTemplates(INITIAL_TEMPLATES);
-    setSelectedTemplateSrc(INITIAL_TEMPLATES[0].src);
+      if (tplToDelete.filename) {
+        await fetch('/api/templates', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: tplToDelete.filename })
+        });
+      }
+    } catch (err) {
+      console.error('API Error deleting template:', err);
+    }
+
+    const updated = templates.filter((t) => t.id !== tplToDelete.id);
+    setTemplates(updated);
+
+    if (updated.length > 0) {
+      setSelectedTemplateSrc(updated[0].src);
+    }
   };
 
   const handlePhotoUpload = (dataUrl) => {
@@ -278,7 +288,6 @@ export default function App() {
         templates={templates}
         onAddTemplate={handleAddTemplate}
         onDeleteTemplate={handleDeleteTemplate}
-        onResetDefaults={handleResetDefaults}
       />
 
       <footer className="app-footer">
