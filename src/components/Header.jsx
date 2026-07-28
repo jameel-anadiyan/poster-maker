@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Header({ onOpenAdmin }) {
+export default function Header({ onOpenAdmin, onChangeTemplate }) {
   return (
     <header className="app-header">
       <div className="brand">
@@ -11,15 +11,27 @@ export default function Header({ onOpenAdmin }) {
         <span className="brand-badge">React HD</span>
       </div>
 
-      <button
-        type="button"
-        className="btn btn-secondary"
-        style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', minHeight: '36px' }}
-        onClick={onOpenAdmin}
-        title="Open Admin Console (Password: 5005)"
-      >
-        ⚙️ Admin Console
-      </button>
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', minHeight: '36px' }}
+          onClick={onChangeTemplate}
+          title="Change Template Frame"
+        >
+          🖼️ Select Template
+        </button>
+
+        <button
+          type="button"
+          className="btn btn-secondary"
+          style={{ padding: '0.35rem 0.75rem', fontSize: '0.8rem', minHeight: '36px' }}
+          onClick={onOpenAdmin}
+          title="Open Admin Console (Password: 5005)"
+        >
+          ⚙️ Admin Console
+        </button>
+      </div>
     </header>
   );
 }

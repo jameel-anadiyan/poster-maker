@@ -31,11 +31,11 @@ export default function PhotoUpload({ photoImage, onPhotoUpload, onOpenCrop, onR
         </span>
       </div>
 
+      {/* Gallery File Input Only (No capture attribute) */}
       <input
         type="file"
         ref={fileInputRef}
         accept="image/*"
-        capture="environment"
         className="hidden"
         onChange={handleFileChange}
       />
@@ -46,7 +46,7 @@ export default function PhotoUpload({ photoImage, onPhotoUpload, onOpenCrop, onR
           className="btn btn-primary btn-full"
           onClick={() => fileInputRef.current && fileInputRef.current.click()}
         >
-          <span>📷</span> Upload / Take Photo
+          <span>📁</span> Upload Photo
         </button>
         {photoImage && (
           <div className="action-row">

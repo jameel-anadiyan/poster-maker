@@ -8,15 +8,34 @@ import CanvasEditor from './components/CanvasEditor';
 import ControlsPanel from './components/ControlsPanel';
 import CropModal from './components/CropModal';
 import AdminModal from './components/AdminModal';
+import TemplateSelectModal from './components/TemplateSelectModal';
 
 const INITIAL_TEMPLATES = [
   { id: 'happy-cust-1080', name: 'Happy Cust 1080x1080', src: 'assets/templates/happy customer template 1080x1080.png', filename: 'happy customer template 1080x1080.png' },
   { id: 'happy-cust-full', name: 'Happy Customer', src: 'assets/templates/happy customer template.png', filename: 'happy customer template.png' }
 ];
 
+const STORAGE_KEY = 'template_editor_custom_templates';
+
 export default function App() {
-  const [templates, setTemplates] = useState(INITIAL_TEMPLATES);
-  const [selectedTemplateSrc, setSelectedTemplateSrc] = useState('assets/templates/happy customer template 1080x1080.png');
+  const [templates, setTemplates] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsedCustoms = JSON.parse(saved);
+        if (Array.isArray(parsedCustoms) && parsedCustoms.length > 0) {
+          const customIds = new Set(parsedCustoms.map((t) => t.id));
+          const defaultsFiltered = INITIAL_TEMPLATES.filter((t) => !customIds.has(t.id));
+          return [...defaultsFiltered, ...parsedCustoms];
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load saved templates from localStorage:', err);
+    }
+    return INITIAL_TEMPLATES;
+  });
+
+  const [selectedTemplateSrc, setSelectedTemplateSrc] = useState('');
   const [templateImage, setTemplateImage] = useState(null);
   const [nativeDim, setNativeDim] = useState({ width: 1080, height: 1080 });
 
@@ -25,17 +44,19 @@ export default function App() {
 
   const [layerOrder, setLayerOrder] = useState('template-above');
   const [photoState, setPhotoState] = useState({
-    x: 400,
-    y: 550,
+    x: 540,
+    y: 540,
     scale: 1.0,
     rotation: 0
   });
 
+  // Controls whether the initial Template Selection intro screen is open
+  const [isTemplateSelectOpen, setIsTemplateSelectOpen] = useState(true);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const canvasEditorRef = useRef(null);
 
-  // Load disk templates from API on mount
+  // Sync disk templates on mount
   useEffect(() => {
     fetchDiskTemplates();
   }, []);
@@ -47,14 +68,10 @@ export default function App() {
         const diskList = await res.json();
         if (Array.isArray(diskList) && diskList.length > 0) {
           setTemplates(diskList);
-          // If current selected is not in list, select first
-          if (!diskList.some((t) => selectedTemplateSrc.includes(t.filename || t.src))) {
-            setSelectedTemplateSrc(diskList[0].src);
-          }
         }
       }
     } catch (err) {
-      console.warn('Could not fetch templates from API, using defaults:', err);
+      console.warn('Using default initial templates:', err);
     }
   };
 
@@ -81,6 +98,11 @@ export default function App() {
     setSelectedTemplateSrc(src);
   };
 
+  const handleConfirmTemplateSelection = (src) => {
+    setSelectedTemplateSrc(src);
+    setIsTemplateSelectOpen(false);
+  };
+
   const handleAddTemplate = async (name, base64Data) => {
     try {
       const res = await fetch('/api/templates', {
@@ -94,21 +116,17 @@ export default function App() {
         setTemplates((prev) => [...prev, savedTpl]);
         setSelectedTemplateSrc(`${savedTpl.src}?v=${Date.now()}`);
         return savedTpl;
-      } else {
-        throw new Error('Failed to save to disk server');
       }
-    } catch (err) {
-      console.error('API Error saving template:', err);
-      // Fallback in-memory
-      const fallbackTpl = {
-        id: `custom-${Date.now()}`,
-        name,
-        src: base64Data
-      };
-      setTemplates((prev) => [...prev, fallbackTpl]);
-      setSelectedTemplateSrc(base64Data);
-      return fallbackTpl;
-    }
+    } catch (err) {}
+
+    const fallbackTpl = {
+      id: `custom-${Date.now()}`,
+      name,
+      src: base64Data
+    };
+    setTemplates((prev) => [...prev, fallbackTpl]);
+    setSelectedTemplateSrc(base64Data);
+    return fallbackTpl;
   };
 
   const handleDeleteTemplate = async (tplToDelete) => {
@@ -120,9 +138,7 @@ export default function App() {
           body: JSON.stringify({ filename: tplToDelete.filename })
         });
       }
-    } catch (err) {
-      console.error('API Error deleting template:', err);
-    }
+    } catch (err) {}
 
     const updated = templates.filter((t) => t.id !== tplToDelete.id);
     setTemplates(updated);
@@ -205,13 +221,16 @@ export default function App() {
   };
 
   let activeStep = 1;
-  if (!templateImage) activeStep = 1;
+  if (isTemplateSelectOpen || !templateImage) activeStep = 1;
   else if (!photoImage) activeStep = 2;
   else activeStep = 3;
 
   return (
     <>
-      <Header onOpenAdmin={() => setIsAdminOpen(true)} />
+      <Header
+        onOpenAdmin={() => setIsAdminOpen(true)}
+        onChangeTemplate={() => setIsTemplateSelectOpen(true)}
+      />
       <StepNav activeStep={activeStep} />
 
       <main className="app-container">
@@ -243,7 +262,10 @@ export default function App() {
           <TemplateGallery
             templates={templates}
             selectedTemplate={selectedTemplateSrc}
-            onSelectTemplate={handleSelectTemplate}
+            onSelectTemplate={(src) => {
+              handleSelectTemplate(src);
+              setIsTemplateSelectOpen(false);
+            }}
             nativeDim={nativeDim}
           />
 
@@ -275,6 +297,15 @@ export default function App() {
           </div>
         </aside>
       </main>
+
+      {/* Initial Template Selection Intro Modal */}
+      <TemplateSelectModal
+        isOpen={isTemplateSelectOpen}
+        templates={templates}
+        selectedTemplate={selectedTemplateSrc || (templates[0] ? templates[0].src : '')}
+        onSelectTemplate={handleSelectTemplate}
+        onConfirmSelection={handleConfirmTemplateSelection}
+      />
 
       <CropModal
         isOpen={isCropOpen}
