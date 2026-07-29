@@ -13,7 +13,10 @@ import MobileQuickBar from './components/MobileQuickBar';
 const INITIAL_TEMPLATES = [
   { id: 'happy-customer', name: 'Happy Customer', src: 'assets/templates/HAPPY CUSTOMER.png', filename: 'HAPPY CUSTOMER.png' },
   { id: 'birthday-template', name: 'Birthday Template', src: 'assets/templates/birthday_template.png', filename: 'birthday_template.png' },
-  { id: 'anniversary-template', name: 'Anniversary Template', src: 'assets/templates/Anniversary template.png', filename: 'Anniversary template.png' }
+  { id: 'anniversary-template', name: 'Anniversary Template', src: 'assets/templates/Anniversary template.png', filename: 'Anniversary template.png' },
+  { id: 'anniversary-portrait', name: 'Anniversary (Portrait)', src: 'assets/templates/anniversary(portrait frame).png', filename: 'anniversary(portrait frame).png' },
+  { id: 'birthday-portrait', name: 'Birthday (Portrait)', src: 'assets/templates/birthday(portrait frame).png', filename: 'birthday(portrait frame).png' },
+  { id: 'happy-portrait', name: 'Happy (Portrait)', src: 'assets/templates/happy(portrait frame).png', filename: 'happy(portrait frame).png' }
 ];
 
 const STORAGE_KEY = 'template_editor_custom_templates';
