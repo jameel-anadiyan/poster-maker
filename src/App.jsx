@@ -16,7 +16,9 @@ const INITIAL_TEMPLATES = [
   { id: 'anniversary-template', name: 'Anniversary Template', src: 'assets/templates/Anniversary template.png', filename: 'Anniversary template.png' },
   { id: 'anniversary-portrait', name: 'Anniversary (Portrait)', src: 'assets/templates/anniversary(portrait frame).png', filename: 'anniversary(portrait frame).png' },
   { id: 'birthday-portrait', name: 'Birthday (Portrait)', src: 'assets/templates/birthday(portrait frame).png', filename: 'birthday(portrait frame).png' },
-  { id: 'happy-portrait', name: 'Happy (Portrait)', src: 'assets/templates/happy(portrait frame).png', filename: 'happy(portrait frame).png' }
+  { id: 'happy-portrait', name: 'Happy (Portrait)', src: 'assets/templates/happy(portrait frame).png', filename: 'happy(portrait frame).png' },
+  { id: 'onam-landscape', name: 'Onam (Landscape)', src: 'assets/templates/ONAM LANDSCAPE.png', filename: 'ONAM LANDSCAPE.png' },
+  { id: 'onam-portrait', name: 'Onam (Portrait)', src: 'assets/templates/ONAM POTRAIT.png', filename: 'ONAM POTRAIT.png' }
 ];
 
 const STORAGE_KEY = 'template_editor_custom_templates';
