@@ -19,8 +19,8 @@ const INITIAL_TEMPLATES = [
   { id: 'happy-portrait', name: 'Happy (Portrait)', src: 'assets/templates/happy(portrait frame).png', filename: 'happy(portrait frame).png' },
   { id: 'onam-landscape', name: 'Onam (Landscape)', src: 'assets/templates/ONAM LANDSCAPE.png', filename: 'ONAM LANDSCAPE.png' },
   { id: 'onam-portrait', name: 'Onam (Portrait)', src: 'assets/templates/ONAM POTRAIT.png', filename: 'ONAM POTRAIT.png' },
-  { id: 'raksha-landscape', name: 'Raksha Bandhan (Landscape)', src: 'assets/templates/Raksha bandan Landscape.png', filename: 'Raksha bandan Landscape.png' },
-  { id: 'raksha-portrait', name: 'Raksha Bandhan (Portrait)', src: 'assets/templates/Raksha bandan Protrait.png', filename: 'Raksha bandan Protrait.png' }
+  { id: 'raksha-landscape', name: 'Raksha Bandhan (Landscape)', src: 'assets/templates/SWA Raksha bandan template Landscape.png', filename: 'SWA Raksha bandan template Landscape.png' },
+  { id: 'raksha-portrait', name: 'Raksha Bandhan (Portrait)', src: 'assets/templates/SWA Raksha bandan template Protrait.png', filename: 'SWA Raksha bandan template Protrait.png' }
 ];
 
 const STORAGE_KEY = 'template_editor_custom_templates';
