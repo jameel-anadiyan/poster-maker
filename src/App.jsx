@@ -18,7 +18,9 @@ const INITIAL_TEMPLATES = [
   { id: 'birthday-portrait', name: 'Birthday (Portrait)', src: 'assets/templates/birthday(portrait frame).png', filename: 'birthday(portrait frame).png' },
   { id: 'happy-portrait', name: 'Happy (Portrait)', src: 'assets/templates/happy(portrait frame).png', filename: 'happy(portrait frame).png' },
   { id: 'onam-landscape', name: 'Onam (Landscape)', src: 'assets/templates/ONAM LANDSCAPE.png', filename: 'ONAM LANDSCAPE.png' },
-  { id: 'onam-portrait', name: 'Onam (Portrait)', src: 'assets/templates/ONAM POTRAIT.png', filename: 'ONAM POTRAIT.png' }
+  { id: 'onam-portrait', name: 'Onam (Portrait)', src: 'assets/templates/ONAM POTRAIT.png', filename: 'ONAM POTRAIT.png' },
+  { id: 'raksha-landscape', name: 'Raksha Bandhan (Landscape)', src: 'assets/templates/Raksha bandan Landscape.png', filename: 'Raksha bandan Landscape.png' },
+  { id: 'raksha-portrait', name: 'Raksha Bandhan (Portrait)', src: 'assets/templates/Raksha bandan Protrait.png', filename: 'Raksha bandan Protrait.png' }
 ];
 
 const STORAGE_KEY = 'template_editor_custom_templates';
