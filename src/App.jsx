@@ -20,7 +20,9 @@ const INITIAL_TEMPLATES = [
   { id: 'onam-landscape', name: 'Onam (Landscape)', src: 'assets/templates/ONAM LANDSCAPE.png', filename: 'ONAM LANDSCAPE.png' },
   { id: 'onam-portrait', name: 'Onam (Portrait)', src: 'assets/templates/ONAM POTRAIT.png', filename: 'ONAM POTRAIT.png' },
   { id: 'raksha-landscape', name: 'Raksha Bandhan (Landscape)', src: 'assets/templates/SWA Raksha bandan template Landscape.png', filename: 'SWA Raksha bandan template Landscape.png' },
-  { id: 'raksha-portrait', name: 'Raksha Bandhan (Portrait)', src: 'assets/templates/SWA Raksha bandan template Protrait.png', filename: 'SWA Raksha bandan template Protrait.png' }
+  { id: 'raksha-portrait', name: 'Raksha Bandhan (Portrait)', src: 'assets/templates/SWA Raksha bandan template Protrait.png', filename: 'SWA Raksha bandan template Protrait.png' },
+  { id: 'diwali-landscape', name: 'Diwali (Landscape)', src: 'assets/templates/SWA diwali Photo frame_landscape.png', filename: 'SWA diwali Photo frame_landscape.png' },
+  { id: 'diwali-portrait', name: 'Diwali (Portrait)', src: 'assets/templates/SWA diwali Photo frame_portrait.png', filename: 'SWA diwali Photo frame_portrait.png' }
 ];
 
 const STORAGE_KEY = 'template_editor_custom_templates';
